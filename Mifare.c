@@ -524,6 +524,7 @@ PyObject *MifareClassic_Authenticate(Mifare *self, PyObject *args)
     uint8_t keyLength=6;
     int i;
     PyObject* transferTuple;
+    uint8_t KeyType;
     #if PY_MAJOR_VERSION >= 3
     if (!PyArg_ParseTuple(args, "bOb", &blockIdx, &transferTuple,&KeyType)) {
 #else
