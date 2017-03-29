@@ -6,3 +6,8 @@ test.py
 *.*~
 .eggs/
 nxp/
+.idea/
+*.so
+*.cbp
+README.html
+

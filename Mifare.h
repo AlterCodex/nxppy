@@ -100,30 +100,42 @@
 #define UID_ASCII_BUFFER_SIZE ((UID_BUFFER_SIZE * 2) + 1)
 #define MIFARECLASSIC_BUFFER_SIZE 16
 
+#define TX_RX_BUFFER_SIZE           128 // 128 Byte buffer
+#define READ_BUFFER_LEN             PHAL_MFUL_READ_BLOCK_LENGTH  /* Buffer length */
+#define WRITE_BUFFER_LEN            PHAL_MFUL_WRITE_BLOCK_LENGTH  /* Buffer length */
+#define MFC_BLOCK_DATA_SIZE         4   /* Block Data size - 16 Bytes */
+#define PHAL_MFC_VERSION_LENGTH     0x08 // from src/phalMFC_Int.h
+
 typedef struct {
-    phbalReg_Stub_DataParams_t balReader;
-    phhalHw_Nfc_Ic_DataParams_t hal;
-    phpalI14443p4_Sw_DataParams_t I14443p4;
-    phpalMifare_Sw_DataParams_t palMifare;
-    phpalI14443p3a_Sw_DataParams_t I14443p3a;
-    phalMful_Sw_DataParams_t alMful;
-    uint8_t bHalBufferReader[0x40];
-    //phKeyStore_Sw_DataParams_t KeyStore;
-    phalMfc_Sw_DataParams_t palMifareClassic;
-    uint8_t Sak;
-    uint8_t *uid;
-    uint8_t uidSize;
+    /* BAL component holder */
+    phbalReg_Stub_DataParams_t sBalReader;
+
+    /* HAL variables */
+    phhalHw_Nfc_Ic_DataParams_t sHal_Nfc_Ic;        /* HAL component holder for Nfc Ic's */
+    uint8_t bHalBufferTx[TX_RX_BUFFER_SIZE];        /* HAL TX buffer */
+    uint8_t bHalBufferRx[TX_RX_BUFFER_SIZE];        /* HAL RX buffer */
+    uint8_t aData[50];                              /* ATR response buffer */
+
+    /* PAL variables */
+    phpalI14443p3a_Sw_DataParams_t spalI14443p3a;   /* PAL I14443-A component */
+    phpalI14443p4a_Sw_DataParams_t spalI14443p4a;   /* PAL ISO I14443-4A component */
+    phpalI14443p3b_Sw_DataParams_t spalI14443p3b;   /* PAL ISO I14443-B component */
+    phpalI14443p4_Sw_DataParams_t spalI14443p4;     /* PAL ISO I14443-4 component */
+    phpalMifare_Sw_DataParams_t spalMifare; /* PAL MIFARE component */
+
+    phacDiscLoop_Sw_DataParams_t sDiscLoop; /* Discovery loop component */
+    phalMfc_Sw_DataParams_t salMfc; /* MIFARE Classic parameter structure */
 } nfc_data;
 
 typedef struct {
-    PyObject_HEAD nfc_data data;
+    PyObject_HEAD nfc_data nfcData;
 } Mifare;
 
-//Pyobject *Mifare_init(Mifare *self, PyObject *args, PyObject *kwds);
-PyObject *Mifare_select(Mifare *self);
-PyObject *Mifare_read_block(Mifare *self, PyObject *args);
-PyObject *Mifare_read_sign(Mifare *self);
-PyObject *Mifare_write_block(Mifare *self, PyObject *args);
+PyObject *Mifare_init(Mifare * self, PyObject * args, PyObject * kwds);
+PyObject *Mifare_select(Mifare * self);
+PyObject *Mifare_read_block(Mifare * self, PyObject * args);
+PyObject *Mifare_read_sign(Mifare * self);
+PyObject *Mifare_write_block(Mifare * self, PyObject * args);
 PyObject *MifareClassic_Authenticate(Mifare *self, PyObject *args);
 PyObject *MifareClassic_read_block(Mifare *self, PyObject *args);
 PyObject *Mifare_get_type(Mifare * self);
